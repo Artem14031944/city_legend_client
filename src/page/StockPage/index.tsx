@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { TypePresents, TypeStockResponse } from '../../common/models/response/StockResponse';
 import { Box } from '@mui/material';
 import { format } from 'date-fns';
-// import ShowMoreInfoModal from '../Modals/ShowMoreInfoModal';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import TableContainer from '@mui/material/TableContainer';
 import TableBody from '@mui/material/TableBody';
@@ -12,6 +12,8 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import Table from '@mui/material/Table';
 import styles from './style.module.css';
+import StockService from '../../common/services/StockService';
+import toast from 'react-hot-toast';
 
 const columns = [
     { id: 1, title: 'Название рассылки' },
@@ -21,18 +23,22 @@ const columns = [
 ];
 
 export default function TableStocks() {
+  const [stocks, setStocks] = useState<TypeStockResponse[]>([]);
+  const [presents, setPresents] = useState<TypePresents[]>([]);
   const [isOpenCreateOrUpdateModal, setOpenCreateOrUpdateModal] = useState<boolean>(false);
   const handleOpen = () => () => setOpenCreateOrUpdateModal(true);
 
-  const stocks = [
-    {id: 1, name: '1'},
-    {id: 2, name: '2'},
-    {id: 3, name: '3'},
-    {id: 4, name: '4'},
-  ];
-  
+  useEffect(() => {
+    StockService.getAll()
+    .then(({ data }) => {
+        setPresents(data.presents ?? []);
+        setStocks(data.stocks.rows ?? []);
+    } )
+    .catch(err => toast.error(err))
+  }, []);
+
   return (
-    <Box>
+    <Box className={styles.wrapper}>
       <TableContainer component={Paper}sx={{ minWidth: 650, maxWidth: 1200, maxHeight: 650 }}>
         <Table aria-label="simple table">
         <TableHead>
@@ -44,8 +50,8 @@ export default function TableStocks() {
             {stocks?.map((stock) => (
             <TableRow key={stock.id} sx={{ '&:last-child td, &:last-child th':{ border: 0 } }}>
                 <TableCell className={styles.row_text_hiden} align="left"><p>{stock.name}</p></TableCell>
-                <TableCell className={styles.row_text_hiden} align="left"><p>{stock.name}</p></TableCell>
-                <TableCell className={styles.row_text_hiden} align="left"><p>{stock.name}</p></TableCell>
+                <TableCell align="left">{format(stock.createdAt, 'dd.MM.yyyy')}</TableCell>
+                <TableCell align="left">{stock.number_present}</TableCell>
                 <TableCell align="left" >
                     <EditIcon sx={{ cursor: 'pointer' }}/>
                     <DeleteForeverIcon sx={{ cursor: 'pointer' }}/>

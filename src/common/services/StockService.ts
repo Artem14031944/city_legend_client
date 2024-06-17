@@ -1,10 +1,10 @@
-import { TypeStockResponse, TypeStocksAndMessageResponse } from "../models/response/StockResponse";
+import { TypeAllStockResponse, TypeStockResponse, TypeStocksAndMessageResponse } from "../models/response/StockResponse";
 import { AxiosResponse } from "axios";
 import $api from "../http";
 
 export default class StockService {
-    static async getAll(): Promise<AxiosResponse<TypeStockResponse[]>> {
-        return $api.get<TypeStockResponse[]>('/stock/get_stocks');
+    static async getAll(): Promise<AxiosResponse<TypeAllStockResponse>> {
+        return $api.get<TypeAllStockResponse>('/stock/get_stocks');
     };
 
     static async update(id: number, stock: TypeStockResponse): Promise<AxiosResponse<TypeStocksAndMessageResponse>> {
